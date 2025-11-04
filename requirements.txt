@@ -1,0 +1,7 @@
+#dependencias del proyecto para facilitar la reproduccion del entorno
+streamlit
+pandas
+numpy
+scikit-learn
+tensorflow
+nltk
