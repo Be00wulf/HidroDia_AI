@@ -1,39 +1,43 @@
-# Directorio del Entorno Virtual
+# 1. Directorios del Entorno Virtual
 .venv/
 venv/
 env/
 
-# Archivos Generados por Python y Caché
+# 2. Archivos de Python Compilados y Caché
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Archivos de Jupyter/Colab (si usaste)
-.ipynb_checkpoints
-
-# Archivos de Logs y Datos Temporales
+# 3. Datos Generados y Guardados Localmente
+# La carpeta de datos crudos (datasets)
+data/
+# Archivos de Logs y Temporales
 *.log
 *.tmp
 *.temp
 
-# Archivos de Bases de Datos (SQLite)
-# **Importante:** SQLite guarda la DB en un archivo. Lo ignoramos.
+# 4. Bases de Datos (SQLite)
+# El archivo del Diario de Síntomas
 *.db
 *.sqlite
 *.sqlite3
 
-# Modelos Entrenados (Archivos Grandes)
-# Ignora los archivos de modelos binarios de Keras/TensorFlow.
-# Solo sube el código que los entrena, no el modelo final.
+# 5. Modelos de Machine Learning y Objetos Binarios 
+# Modelos de Keras/TensorFlow guardados:
 *.h5
 *.hdf5
 saved_model/
 checkpoints/
 
-# Archivos del SO y IDE (VS Code)
+# Objetos de serialización (pickle) guardados por data_prep.py:
+# esto incluye label_encoder.pkl y severity_map.pkl
+*.pkl
+*.pickle
+# archivo de NumPy para arrays muy grandes:
+*.npy
+
+# 6. Archivos del SO y IDE (VS Code)
 .DS_Store
 .vscode/
 
-# Ignorar archivos grandes de datos (Si son públicos, déjalos fuera, si son privados, ignóralos)
-# data/
