@@ -98,7 +98,7 @@ def apply_symbolic_hydrocephalus_check(detected_symptoms_list):
     """
     symptoms = set(detected_symptoms_list)
     
-    # Síntomas clave de urgencia (Ejemplos basados en tu experiencia):
+    # Síntomas clave de urgencia - pendientes agregar
     key_severe_symptoms = {
         "dolor de cabeza",
         "vomiting", 
