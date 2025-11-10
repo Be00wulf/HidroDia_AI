@@ -13,15 +13,15 @@ LE_PATH = os.path.join(MODEL_DIR, 'label_encoder.pkl')
 SEV_MAP_PATH = os.path.join(MODEL_DIR, 'severity_map.pkl')
 SYMPTOM_COLS_PATH = os.path.join(MODEL_DIR, 'symptom_cols_list.pkl') 
 
-# --- OBJETOS GLOBALES que se cargarán una vez al iniciar la app
-# Usamos un diccionario para cargar y almacenar los objetos
+# OBJETOS GLOBALES cargados al inicio de la app
+# usamos un diccionario para cargar y almacenar los objetos
 MODEL_ASSETS = {}
 
 def load_prediction_assets():
     """Carga el modelo Keras, el Label Encoder y el mapa de gravedad."""
     
     if not os.path.exists(MODEL_PATH):
-        print("Error: Modelo Keras no encontrado. hay que ejecutar train_model.py primero")
+        print("Error: Modelo Keras no encontrado revisar train_model")
         return False
     
     try:
@@ -36,10 +36,10 @@ def load_prediction_assets():
         with open(SEV_MAP_PATH, 'rb') as f:
             MODEL_ASSETS['severity_map'] = pickle.load(f)
             
-        print("Activos del modelo cargados exitosamente.")
+        print("activos del modelo cargados exitosamente")
         return True
     except Exception as e:
-        print(f"Error al cargar los activos del modelo: {e}")
+        print(f"error al cargar modelo {e}")
         return False
 
 def preprocess_symptoms_for_prediction(symptoms_text):
@@ -51,25 +51,25 @@ def preprocess_symptoms_for_prediction(symptoms_text):
         load_prediction_assets()
         
     severity_map = MODEL_ASSETS.get('severity_map')
-    # la lista de 17 síntomas que el modelo conoce
+    # 17 síntomas conocidos por el modelo
     symptom_cols_list = MODEL_ASSETS.get('symptom_cols_list') 
     
     if severity_map is None or symptom_cols_list is None:
         return None, None
     
     # 1. Normalizar la entrada del usuario
-    # Tomamos la entrada y la separamos por comas
+    # toma la entrada y la separa por comas
     input_list = [s.strip().replace('_', ' ').lower() for s in symptoms_text.split(',')]
     
     # 2. Crear el vector de características ponderado (X)
-    # Inicializar el vector con ceros. SU TAMAÑO ES FIJO: 17
+    # inicializa el vector con ceros con tamanio fijo de 17
     symptom_vector = np.zeros(len(symptom_cols_list))
     
     detected_symptoms = []
     
-    # Mapeo y ponderación:
+    # mapeo y ponderación:
     for input_symptom in input_list:
-        # Buscar si el síntoma está en la lista de 17 síntomas CONOCIDOS por el modelo
+        # buscar si el síntoma está en la lista de 17 síntomas CONOCIDOS por el modelo
         if input_symptom in symptom_cols_list:
             
             # 1. Encontrar el índice dentro del vector de 17 elementos
@@ -81,11 +81,8 @@ def preprocess_symptoms_for_prediction(symptoms_text):
             # 3. Asignar el peso en la posición correcta (0 a 16) del vector de 17 elementos
             symptom_vector[index] = symptom_weight
             detected_symptoms.append(input_symptom)
-        
-        # Opcional: Si el usuario pone un síntoma que existe en el severity_map
-        # pero que no está entre los 17 originales, lo ignoramos.
     
-    # El modelo espera una entrada 2D (1 fila, 17 columnas)
+    # el modelo espera una entrada 2D (1 fila, 17 columnas)
     X_predict = symptom_vector.reshape(1, -1)
     
     return X_predict, ",".join(detected_symptoms)
@@ -93,25 +90,25 @@ def preprocess_symptoms_for_prediction(symptoms_text):
 
 def apply_symbolic_hydrocephalus_check(detected_symptoms_list):
     """
-    Implementa la IA Simbólica (basada en reglas) para alerta de Hidrocefalia.
-    Se basa en la Triada clásica y síntomas severos/atípicos.
+    implementa la IA simbolica (basada en reglas) para alerta de hidrocefalia
+    se basa en la triada clásica hakim-adams y síntomas severos/atípicos
     """
     symptoms = set(detected_symptoms_list)
     
-    # Síntomas clave de urgencia - pendientes agregar
+    # sintomas clave de urgencia - pendientes agregar
     key_severe_symptoms = {
-        "dolor de cabeza",
+        "headache",
         "vomiting", 
         "blurred and distorted vision", 
         "dizziness", 
         "unsteadiness" 
     }
     
-    # Contar cuántos síntomas severos clave están presentes
+    # contar cant de sintomas severos clave presentes
     severity_count = len(symptoms.intersection(key_severe_symptoms))
     
     if severity_count >= 3:
-        return "ALERTA URGENTE (Hidrocefalia, Triada Sospechosa)", "danger"
+        return "ALERTA URGENTE (Hidrocefalia, Sintomas Sospechosos)", "danger"
     elif severity_count >= 1 and ("vomiting" in symptoms or "blurred and distorted vision" in symptoms):
         return "ALERTA MODERADA (Requiere Seguimiento)", "warning"
     else:
@@ -148,17 +145,15 @@ def get_prediction(symptoms_text):
         probability = probabilities[i] * 100
         top_predictions.append((disease, probability))
 
-    # 4. Aplicar la verificación simbólica de Hidrocefalia
+    # 4. aplicar verificación simbólica de Hidrocefalia
     hydro_alert, alert_level = apply_symbolic_hydrocephalus_check(detected_symptoms_list)
     
     return top_predictions, hydro_alert, alert_level
 
-# Asegurar que los activos se carguen al iniciar
+# asegura que los activos se carguen al iniciar
 if __name__ == "__main__":
     if load_prediction_assets():
         print("\n--- Prueba de predicción ---")
-        # NOTA: Los síntomas DEBEN coincidir con los de tu severity_map.
-        # Usa síntomas como 'vomiting', 'headache', 'skin rash'
         test_symptoms = "vomiting, headache, joint pain" 
         predictions, alert, level = get_prediction(test_symptoms)
         
@@ -167,3 +162,4 @@ if __name__ == "__main__":
         print("Predicciones del Modelo:")
         for disease, prob in predictions:
             print(f"- {disease}: {prob:.2f}%")
+            
